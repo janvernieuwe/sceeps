@@ -17,7 +17,7 @@ module.exports = {
     isUnloadingState: function () {
         return this.creep.memory.state === 'UNLOADING';
     },
-    run: function (creep) {
+    run: function (creep, halt) {
         if (creep.isFull()) {
             creep.memory.state = 'UNLOADING';
         }
@@ -25,6 +25,9 @@ module.exports = {
             creep.memory.state = 'LOADING';
         }
         if (this.isLoadingState() && !creep.isFull()) {
+            if(halt) {
+                return;
+            }
             if (creep.withdrawing(this.spawn, RESOURCE_ENERGY)) {
                 if (this.debug) console.log(creep + ' is loading from ' + this.spawn);
                 return;

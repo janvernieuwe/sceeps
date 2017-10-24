@@ -6,7 +6,7 @@ module.exports = {
         creep.memory.source = this.source === null ? null : this.source.id;
         creep.memory.spawn = this.target === null ? null : this.target.id;
     },
-    run: function (creep) {
+    run: function (creep, halt) {
         if (!creep.isFull()) {
             if (creep.harvesting(this.source)) {
                 if (this.debug) console.log(creep + ' is harvesting ' + this.source);

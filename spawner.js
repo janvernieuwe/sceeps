@@ -22,10 +22,10 @@ module.exports = {
                 continue;
             }
             if (this.countTask(task) < config.min || 0) {
-                this.spawnType(task, config.parts, config.memory);
-                break;
+                return this.spawnType(task, config.parts, config.memory);
             }
         }
+        return true;
     },
     spawnType: function (task, parts, memory) {
         memory = memory || {};
@@ -43,7 +43,7 @@ module.exports = {
             console.log('Hooray', name, 'is born');
             return true;
         }
-        return false;
+        return ['HARVESTER', 'UPGRADER'].indexOf(task) === false;
     },
     garbageCollection: function () {
         for (let name in Memory.creeps) {

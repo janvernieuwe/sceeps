@@ -9,12 +9,10 @@ module.exports = {
         for (let roleName in roles) {
             let role = roles[roleName];
             let task = roleName.toUpperCase();
-            if (!halt || roleName === 'harvester') {
-                _.filter(Game.creeps, (c) => c.memory.task === task).forEach(function (creep) {
-                    role.init(creep, Game.spawns.Spawn1);
-                    role.run(creep);
-                });
-            }
+            _.filter(Game.creeps, (c) => c.memory.task === task).forEach(function (creep) {
+                role.init(creep, Game.spawns.Spawn1);
+                role.run(creep, halt);
+            });
         }
     }
 };
