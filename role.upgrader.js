@@ -4,7 +4,6 @@ module.exports = {
         this.spawn = spawn;
         this.controller = creep.room.controller;
         this.debug = false;
-        creep.memory.task = 'UPGRADER';
     },
     isUpgrading: function () {
         return this.creep.upgradeController(this.controller) !== ERR_NOT_IN_RANGE;
@@ -18,32 +17,32 @@ module.exports = {
     isUnloadingState: function () {
         return this.creep.memory.state === 'UNLOADING';
     },
-    run: function () {
-        if (this.creep.isFull()) {
-            this.creep.memory.state = 'UNLOADING';
+    run: function (creep) {
+        if (creep.isFull()) {
+            creep.memory.state = 'UNLOADING';
         }
-        if (this.creep.isEmpty()) {
-            this.creep.memory.state = 'LOADING';
+        if (creep.isEmpty()) {
+            creep.memory.state = 'LOADING';
         }
-        if (this.isLoadingState() && !this.creep.isFull()) {
-            if (this.isLoading()) {
-                if (this.debug) console.log(this.creep + ' is loading from ' + this.spawn);
+        if (this.isLoadingState() && !creep.isFull()) {
+            if (creep.withdrawing(this.spawn, RESOURCE_ENERGY)) {
+                if (this.debug) console.log(creep + ' is loading from ' + this.spawn);
                 return;
             }
-            if (this.debug) console.log(this.creep + ' is moving to ' + this.spawn);
+            if (this.debug) console.log(creep + ' is moving to ' + this.spawn);
             if(this.spawn.energy === 0) {
                 return;
             }
-            return this.creep.moveTo(this.spawn);
+            return creep.moveTo(this.spawn);
         }
-        if (this.isUnloadingState() && !this.creep.isEmpty()) {
-            if (this.isUpgrading()) {
-                if (this.debug) console.log(this.creep + ' is upgrading to ' + this.controller);
+        if (this.isUnloadingState() && !creep.isEmpty()) {
+            if (creep.transferring(this.controller, RESOURCE_ENERGY)) {
+                if (this.debug) console.log(creep + ' is upgrading to ' + this.controller);
                 return;
             }
-            if (this.debug) console.log(this.creep + ' is moving to ' + this.spawn);
-            return this.creep.moveTo(this.controller);
+            if (this.debug) console.log(creep + ' is moving to ' + this.spawn);
+            return creep.moveTo(this.controller);
         }
-        if (this.debug) console.log(this.creep, 'noop');
+        if (this.debug) console.log(creep, 'noop');
     }
 }

@@ -1,28 +1,15 @@
 require('prototype.creep')();
 module.exports.loop = function () {
     let spawner = require('spawner');
-    let roles = {
-        harvester: require('role.harvester'),
-        upgrader: require('role.upgrader'),
-        builder: require('role.builder'),
-        spawner: require('spawner')
+    let taskRunner = require('taskrunner');
+    let population = {
+        HARVESTER: {min: 10, parts: [WORK, MOVE, CARRY, WORK]},
+        UPGRADER: {min: 2, parts: [WORK, WORK, MOVE, CARRY], memory: {state: 'LOADING'}},
+        BUILDER: {min: 2, parts: [WORK, CARRY, MOVE, CARRY], memory: {state: 'LOADING'}},
     };
-    spawner.init(Game.spawns.Spawn1, {
-        HARVESTER: 10,
-        UPGRADER: 6,
-        BUILDER: 2,
-    });
-    let halt = !spawner.run();
-    for (let roleName in roles) {
-        let role = roles[roleName];
-        let task = roleName.toUpperCase();
-        _.filter(Game.creeps, (c) => c.memory.task === task).forEach(function (creep) {
-            if (!halt || roleName === 'harvester') {
-                role.init(creep, Game.spawns.Spawn1);
-                role.run();
-            }
-        });
-    }
+    spawner.init(Game.spawns.Spawn1);
+    let halt = !spawner.populate(population);
+    taskRunner.run(halt);
     if (Game.time % 10 === 0) {
         console.log(
             'Tick',
@@ -34,10 +21,5 @@ module.exports.loop = function () {
             'Builders: ' + spawner.countTask('BUILDER')
         );
     }
-    for (let name in Memory.creeps) {
-        if (Game.creeps[name] === undefined) {
-            console.log('RIP', name);
-            delete(Memory.creeps[name]);
-        }
-    }
+    spawner.garbageCollection();
 }

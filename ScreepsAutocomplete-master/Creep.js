@@ -282,7 +282,7 @@ Creep.prototype =
      *
      * @return {number|OK|ERR_NOT_OWNER|ERR_BUSY|ERR_NOT_FOUND|ERR_NOT_ENOUGH_RESOURCES|ERR_INVALID_TARGET|ERR_NOT_IN_RANGE|ERR_NO_BODYPART}
      */
-    harvest: function(target) { },
+    harvesting: function(target) { },
 
     /**
      * Heal self or another creep.
@@ -546,7 +546,7 @@ Creep.prototype =
      * @see {@link http://support.screeps.com/hc/en-us/articles/203013212-Creep#withdraw}
      *
      * @type {function}
-     *
+     *unloadingunloadingunloading
      * @param {Structure} target The target object.
      * @param {string} resourceType One of the RESOURCE_* constants.
      * @param {number|undefined|null} [amount] The amount of resources to be transferred. If omitted, all the available carried amount is used.

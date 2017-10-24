@@ -7,56 +7,50 @@ module.exports = {
     countTask: function (task) {
         return _.filter(Game.creeps, (c) => c.memory.task === task).length;
     },
-    spawnWorker: function (type) {
-        let creep = null;
-        let name = '';
-        if (type === 'HARVESTER') {
-            //console.log('Spawn new harvester');
-            let attr = [WORK, MOVE, CARRY, WORK];
-            name = 'Harvester' + Game.time;
-            creep = this.spawn.spawnCreep(attr, name, {memory: {task: 'HARVESTER'}});
-        }
-        if (type === 'UPGRADER') {
-            //console.log('Spawn new upgrader');
-            let attr = [WORK, WORK, MOVE, CARRY];
-            name = 'Upgrader' + Game.time;
-            creep = this.spawn.spawnCreep(attr, name, {
-                memory: {
-                    task: 'UPGRADER',
-                    state: 'LOADING'
-                }
-            });
-        }
-        if (type === 'BUILDER') {
-            //console.log('Spawn new builder');
-            let attr = [WORK, CARRY, MOVE, CARRY];
-            name = 'Builder' + Game.time;
-            creep = this.spawn.spawnCreep(attr, name, {
-                memory: {
-                    task: 'BUILDER',
-                    state: 'LOADING'
-                }
-            });
-        }
-        if (creep === 0) {
-            console.log('Hooray', name, 'is born');
-            return true;
-        }
-        //console.log('Not enough energy');
-        return false;
-
+    taskToName: function (string) {
+        string = string.toLowerCase();
+        return string.charAt(0).toUpperCase() + string.slice(1) + Game.time;
     },
-    run: function () {
+    populate: function (spawnConfig) {
         if (this.spawn.spawning !== null) {
             return true;
         }
-        for (let type in this.config) {
-            let min = this.config[type];
-            let current = this.countTask(type);
-            if (current < min) {
-                return this.spawnWorker(type);
+        for (let task in spawnConfig) {
+            let config = spawnConfig[task];
+            if (!config.parts.length) {
+                console.log('WARNING: No parts configured for', task);
+                continue;
+            }
+            if (this.countTask(task) < config.min || 0) {
+                this.spawnType(task, config.parts, config.memory);
+                break;
             }
         }
-        return true;
+    },
+    spawnType: function (task, parts, memory) {
+        memory = memory || {};
+        memory.task = task;
+        if (!parts.length) {
+            console.log('Spawn error: no parts', task, parts, memory);
+            return true;
+        }
+        if (!task.length) {
+            console.log('Spawn error: no task', task, parts, memory);
+            return true;
+        }
+        let name = this.taskToName(task);
+        if (this.spawn.spawnCreep(parts, name, {memory: memory}) === 0) {
+            console.log('Hooray', name, 'is born');
+            return true;
+        }
+        return false;
+    },
+    garbageCollection: function () {
+        for (let name in Memory.creeps) {
+            if (Game.creeps[name] === undefined) {
+                console.log('RIP', name);
+                delete(Memory.creeps[name]);
+            }
+        }
     }
 };
