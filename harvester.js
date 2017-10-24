@@ -1,11 +1,13 @@
 module.exports = {
     init: function (creep, spawn) {
         this.creep = creep;
+        //this.spawn = Game.getObjectById(creep.memory.spawn) || creep.pos.findClosestByPath(FIND_MY_STRUCTURES);;
         this.spawn = spawn;
         this.resource = Game.getObjectById(creep.memory.resource) || creep.pos.findClosestByPath(FIND_SOURCES);
         this.debug = false;
         creep.memory.task = 'HARVESTER';
-        creep.memory.resource = this.resource.id;
+        creep.memory.resource = this.resource === null ? null : this.resource.id;
+        creep.memory.spawn = this.spawn === null ? null : this.spawn.id;
     },
     isHarvesting: function () {
         return this.creep.harvest(this.resource) !== ERR_NOT_IN_RANGE;
@@ -26,6 +28,7 @@ module.exports = {
                 return
             }
             if (this.debug) console.log(this.creep + ' is moving to ' + this.resource);
+            this.spawn = null;
             return this.creep.moveTo(this.resource);
         }
         if (this.isFull()) {
@@ -35,7 +38,11 @@ module.exports = {
             }
             this.creep.memory.resource = null;
             if (this.spawn.energyCapacity === this.spawn.energy) {
+                this.spawn = null;
                 return this.creep.moveTo(Game.flags.EnergyUnload);
+            }
+            if (this.spawn === null) {
+                this.spawn = creep.pos.findClosestByPath(FIND_MY_STRUCTURES);
             }
             if (this.debug) console.log(this.creep + ' is moving to ' + this.spawn);
             return this.creep.moveTo(this.spawn);

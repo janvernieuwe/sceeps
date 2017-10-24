@@ -5,7 +5,7 @@ module.exports = {
         this.site = Game.getObjectById(creep.memory.id) || creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
         this.debug = false;
         creep.memory.task = 'BUILDER';
-        creep.memory.id = this.site.id;
+        creep.memory.id = this.site === null ? null : this.site.id;
     },
     isFull: function () {
         return this.creep.carry.energy === this.creep.carryCapacity;
@@ -26,8 +26,8 @@ module.exports = {
         return this.creep.memory.state === 'UNLOADING';
     },
     run: function () {
-        if(this.site === null) {
-            if(this.debug) console.log('Nothing to build');
+        if (this.site === null) {
+            if (this.debug) console.log('Nothing to build');
             return true;
         }
         if (this.isFull()) {
@@ -42,9 +42,6 @@ module.exports = {
                 return;
             }
             if (this.debug) console.log(this.creep, 'is moving to', this.spawn);
-            if (this.spawn.energy === 0) {
-                return;
-            }
             return this.creep.moveTo(this.spawn);
         }
         if (this.isUnloadingState() && !this.isEmpty()) {
