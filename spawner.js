@@ -5,23 +5,19 @@ module.exports = {
         this.debug = true;
     },
     countTask: function (task) {
-        let count = 0;
-        for (let creep in Game.creeps) {
-            count += Game.creeps[creep].memory.task === task;
-        }
-        return count;
+        return _.filter(Game.creeps, (c) => c.memory.task === task).length;
     },
     spawnWorker: function (type) {
         let creep = null;
         let name = '';
         if (type === 'HARVESTER') {
-            console.log('Spawn new harvester');
-            let attr = [WORK, MOVE, CARRY, CARRY];
+            //console.log('Spawn new harvester');
+            let attr = [WORK, MOVE, CARRY, WORK];
             name = 'Harvester' + Game.time;
             creep = this.spawn.spawnCreep(attr, name, {memory: {task: 'HARVESTER'}});
         }
         if (type === 'UPGRADER') {
-            console.log('Spawn new upgrader');
+            //console.log('Spawn new upgrader');
             let attr = [WORK, WORK, MOVE, CARRY];
             name = 'Upgrader' + Game.time;
             creep = this.spawn.spawnCreep(attr, name, {
@@ -32,8 +28,8 @@ module.exports = {
             });
         }
         if (type === 'BUILDER') {
-            console.log('Spawn new builder');
-            let attr = [WORK, WORK, MOVE, CARRY];
+            //console.log('Spawn new builder');
+            let attr = [WORK, CARRY, MOVE, CARRY];
             name = 'Builder' + Game.time;
             creep = this.spawn.spawnCreep(attr, name, {
                 memory: {
@@ -46,7 +42,7 @@ module.exports = {
             console.log('Hooray', name, 'is born');
             return true;
         }
-        console.log('Not enough energy');
+        //console.log('Not enough energy');
         return false;
 
     },

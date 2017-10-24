@@ -7,12 +7,6 @@ module.exports = {
         creep.memory.task = 'BUILDER';
         creep.memory.id = this.site === null ? null : this.site.id;
     },
-    isFull: function () {
-        return this.creep.carry.energy === this.creep.carryCapacity;
-    },
-    isEmpty: function () {
-        return this.creep.carry.energy === 0;
-    },
     isUpgrading: function () {
         return this.creep.build(this.site) !== ERR_NOT_IN_RANGE;
     },
@@ -30,13 +24,13 @@ module.exports = {
             if (this.debug) console.log('Nothing to build');
             return true;
         }
-        if (this.isFull()) {
+        if (this.creep.isFull()) {
             this.creep.memory.state = 'UNLOADING';
         }
-        if (this.isEmpty()) {
+        if (this.creep.isEmpty()) {
             this.creep.memory.state = 'LOADING';
         }
-        if (this.isLoadingState() && !this.isFull()) {
+        if (this.isLoadingState() && !this.creep.isFull()) {
             if (this.isLoading()) {
                 if (this.debug) console.log(this.creep, 'is loading from', this.spawn);
                 return;
@@ -44,7 +38,7 @@ module.exports = {
             if (this.debug) console.log(this.creep, 'is moving to', this.spawn);
             return this.creep.moveTo(this.spawn);
         }
-        if (this.isUnloadingState() && !this.isEmpty()) {
+        if (this.isUnloadingState() && !this.creep.isEmpty()) {
             if (this.isUpgrading()) {
                 if (this.debug) console.log(this.creep, 'is building', this.site);
                 return;
