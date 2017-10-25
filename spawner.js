@@ -43,7 +43,7 @@ module.exports = {
             console.log('Hooray', name, 'is born');
             return true;
         }
-        return ['HARVESTER', 'UPGRADER'].indexOf(task) === false;
+        return ['HARVESTER'/*, 'UPGRADER'*/].indexOf(task) === false;
     },
     garbageCollection: function () {
         for (let name in Memory.creeps) {
