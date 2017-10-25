@@ -67,7 +67,7 @@ module.exports = function () {
         if (!this.exists) {
             return;
         }
-        // Switch stats
+        // Switch states
         if (this.isFull() && !this.isUnloading()) {
             this.memory.state = HARVESTER_UNLOADING;
             this.memory.source = null;
@@ -76,7 +76,7 @@ module.exports = function () {
             this.memory.state = HARVESTER_LOADING;
             this.memory.unload = null;
         }
-        // Harvest or load
+        // Harvest or unload
         if (this.isLoading()) {
             this._harvest();
         }

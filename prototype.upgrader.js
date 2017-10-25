@@ -1,7 +1,8 @@
 module.exports = function () {
     const UPGRADER_UPGRADING = 'UPGRADING';
     const UPGRADER_LOADING = 'LOADING';
-    Upgrader = function (creep) {
+    Upgrader = function (creep, halt) {
+        this.halt = halt;
         this.error = false;
         try {
             Object.assign(this, creep);

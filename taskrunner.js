@@ -1,28 +1,26 @@
 module.exports = {
     run: function (halt) {
+        let noBuildWork = null;
         let roles = {
-            harvester: function(creep) {
+            harvester: function (creep) {
                 require('prototype.harvester')();
                 (new Harvester(creep)).run();
             },
-            upgrader: function(creep) {
+            upgrader: function (creep, halt) {
                 require('prototype.upgrader')();
-                (new Upgrader(creep)).run();
+                (new Upgrader(creep, halt)).run();
             },
-            builder: require('role.builder'),
-            spawner: require('spawner')
+            builder: function (creep, halt) {
+                require('prototype.builder')();
+                (new Builder(creep, halt)).run();
+            }
         };
         for (let roleName in roles) {
-            let role = roles[roleName];
+            let lazyRunner = roles[roleName];
             let task = roleName.toUpperCase();
             _.filter(Game.creeps, (c) => c.memory.task === task).forEach(function (creep) {
-                if(typeof(role) === "function") {
-                    return role(creep);
-                }
-                // Legacy
-                role.init(creep, Game.spawns.Spawn1);
-                role.run(creep, halt);
-            }.bind(this));
+                lazyRunner(creep, halt);
+            });
         }
     }
 };
