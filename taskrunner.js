@@ -3,8 +3,7 @@ module.exports = {
         let roles = {
             harvester: require('role.harvester'),
             upgrader: require('role.upgrader'),
-            builder: require('role.builder'),
-            spawner: require('spawner')
+            builder: require('role.builder')
         };
         for (let roleName in roles) {
             let role = roles[roleName];
