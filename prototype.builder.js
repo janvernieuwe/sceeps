@@ -20,7 +20,27 @@ module.exports = function () {
     // Don't put methods above this line !
 
     Builder.prototype.findConstructionSite = function () {
-        this.storeObject(BUILDER_CONSTRUCTION, this.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES));
+        // No walls
+        this.storeObject(BUILDER_CONSTRUCTION, this.pos.findClosestByPath(
+            FIND_MY_CONSTRUCTION_SITES
+        ));
+        // Nothing to do, fine then build walls
+        if (this.construction) {
+            return;
+        }
+        this.storeObject(BUILDER_CONSTRUCTION, this.findWeakestWall());
+    };
+
+    Builder.prototype.findWeakestWall = function() {
+        let walls = this.room.find(
+            FIND_STRUCTURES,
+            {filter: (s) => s.structureType === STRUCTURE_WALL}
+        );
+        walls = walls.sort((a, b) => a.hits > b.hits ? 1 : -1);
+        if(!walls.length) {
+            return null;
+        }
+        return walls[0];
     };
 
     Builder.prototype.findSource = function () {
@@ -44,12 +64,29 @@ module.exports = function () {
         }
     };
 
+    Builder.prototype._repair = function () {
+        if (!this.repairing(this.construction)) {
+            this.moveTo(this.construction);
+        }
+    }
+
+    Builder.prototype.isWall = function (object) {
+        return object
+            && object.structureType === STRUCTURE_WALL
+            && object.energy === object.energyCapacity;
+    }
+
     Builder.prototype._build = function () {
         if (!this.construction) {
             this.findConstructionSite();
         }
+        // In case of walls, upgrade
+        if (this.isWall(this.construction)) {
+            return this._repair();
+        }
+        // Else build
         if (!this.building(this.construction, RESOURCE_ENERGY)) {
-            this.moveTo(this.construction);
+            return this.moveTo(this.construction);
         }
     };
 
@@ -57,12 +94,12 @@ module.exports = function () {
         if (this.error) {
             return;
         }
-        if (this.isFull()) {
+        if (this.isFull() && !this.isBuilding()) {
             this.memory.state = BUILDER_BUILDING;
         }
-        if (this.isEmpty()) {
+        if (this.isEmpty() && !this.isLoading()) {
             this.memory.state = BUILDER_LOADING;
-            this.construction = null;
+            this.deleteObject(BUILDER_CONSTRUCTION);
         }
         if (this.isLoading()) {
             this._load();

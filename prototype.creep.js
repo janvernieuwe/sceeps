@@ -17,6 +17,10 @@ module.exports = function () {
         return this.transfer(target, type) === OK;
     };
 
+    Creep.prototype.repairing = function (target) {
+        return this.repair(target) === OK;
+    };
+
     Creep.prototype.withdrawing = function (target, type) {
         if (this.halt) {
             this.say('HALT!');
@@ -30,7 +34,7 @@ module.exports = function () {
     };
 
     Creep.prototype.storeObject = function (key, object) {
-        this.memory[key] = object === null ? null : object.id;
+        this.memory[key] = !object ? null : object.id;
         this[key] = object;
     }
 
