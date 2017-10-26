@@ -1,12 +1,17 @@
 module.exports = function () {
+
     const BUILDER_BUILDING = 'BUILDING';
     const BUILDER_LOADING = 'LOADING';
+    const BUILDER_CONSTRUCTION = 'construction';
+    const BUILDER_SOURCE = 'source';
+
     Builder = function (creep, halt) {
         this.halt = halt;
         this.error = false;
         try {
             Object.assign(this, creep);
-            this.loadObjects();
+            this.loadObject(BUILDER_CONSTRUCTION);
+            this.loadObject(BUILDER_SOURCE);
         } catch (e) {
             this.error = true;
         }
@@ -14,20 +19,12 @@ module.exports = function () {
     Builder.prototype = Creep.prototype;
     // Don't put methods above this line !
 
-    Builder.prototype.loadObjects = function () {
-        this.construction = Game.getObjectById(this.memory.construction);
-        this.source = Game.getObjectById(this.memory.source);
-    };
-
     Builder.prototype.findConstructionSite = function () {
-        this.construction = this.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES);
-        this.memory.construction = this.construction;
-        this.memory.construction = this.construction === null ? null : this.construction.id;
+        this.storeObject(BUILDER_CONSTRUCTION, this.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES));
     };
 
     Builder.prototype.findSource = function () {
-        this.source = this.pos.findClosestByPath(FIND_MY_SPAWNS);
-        this.memory.source = this.source === null ? null : this.source.id;
+        this.storeObject(BUILDER_SOURCE, this.pos.findClosestByPath(FIND_MY_SPAWNS));
     };
 
     Builder.prototype.isLoading = function () {
@@ -39,7 +36,7 @@ module.exports = function () {
     };
 
     Builder.prototype._load = function () {
-        if (this.source === null) {
+        if (!this.source) {
             this.findSource();
         }
         if (!this.withdrawing(this.source, RESOURCE_ENERGY)) {
@@ -48,7 +45,7 @@ module.exports = function () {
     };
 
     Builder.prototype._build = function () {
-        if (this.construction === null) {
+        if (!this.construction) {
             this.findConstructionSite();
         }
         if (!this.building(this.construction, RESOURCE_ENERGY)) {

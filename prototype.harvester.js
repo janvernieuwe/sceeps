@@ -1,36 +1,32 @@
 module.exports = function () {
+
     const HARVESTER_LOADING = 'LOADING';
     const HARVESTER_UNLOADING = 'UNLOADING';
+    const HARVESTER_UNLOAD = 'unload';
+    const HARVESTER_SOURCE = 'source';
+
     Harvester = function (creep) {
         this.exists = true;
         try {
             Object.assign(this, creep);
-            this.loadObjects();
+            this.loadObject(HARVESTER_UNLOAD);
+            this.loadObject(HARVESTER_SOURCE);
         } catch (e) {
             this.exists = false;
         }
-        ;
     };
     Harvester.prototype = Creep.prototype;
     // Don't put methods above this line !
 
-    Harvester.prototype.loadObjects = function () {
-        this.unload = Game.getObjectById(this.memory.unload);
-        this.source = Game.getObjectById(this.memory.source);
-    };
-
     Harvester.prototype.findUnload = function () {
-        this.unload = this.pos.findClosestByPath(
+        this.storeObject(HARVESTER_UNLOAD, this.pos.findClosestByPath(
             FIND_MY_STRUCTURES,
             {filter: (s) => s.energy < s.energyCapacity}
-        );
-        this.memory.unload = this.unload;
-        this.memory.unload = this.unload === null ? null : this.unload.id;
+        ));
     };
 
     Harvester.prototype.findSource = function () {
-        this.source = this.pos.findClosestByPath(FIND_SOURCES);
-        this.memory.source = this.source === null ? null : this.source.id;
+        this.storeObject(HARVESTER_SOURCE, this.pos.findClosestByPath(FIND_SOURCES_ACTIVE));
     };
 
     Harvester.prototype.isLoading = function () {
@@ -42,7 +38,7 @@ module.exports = function () {
     };
 
     Harvester.prototype._harvest = function () {
-        if (this.source === null) {
+        if (!this.source) {
             this.findSource();
         }
         if (!this.harvesting(this.source)) {
@@ -51,10 +47,10 @@ module.exports = function () {
     };
 
     Harvester.prototype._unload = function () {
-        if (this.unload !== null && this.unload.energyCapacity === this.unload.energy) {
+        if (this.unload && this.unload.energyCapacity === this.unload.energy) {
             this.unload = null;
         }
-        if (this.unload === null) {
+        if (!this.unload) {
             this.findUnload();
         }
         if (!this.transferring(this.unload, RESOURCE_ENERGY)) {

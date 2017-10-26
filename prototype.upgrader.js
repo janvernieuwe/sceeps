@@ -1,12 +1,17 @@
 module.exports = function () {
+
     const UPGRADER_UPGRADING = 'UPGRADING';
     const UPGRADER_LOADING = 'LOADING';
+    const UPGRADER_CONTROLLER = 'controller';
+    const UPGRADER_SOURCE = 'source';
+
     Upgrader = function (creep, halt) {
         this.halt = halt;
         this.error = false;
         try {
             Object.assign(this, creep);
-            this.loadObjects();
+            this.loadObject(UPGRADER_CONTROLLER);
+            this.loadObject(UPGRADER_SOURCE);
         } catch (e) {
             this.error = true;
         }
@@ -14,20 +19,12 @@ module.exports = function () {
     Upgrader.prototype = Creep.prototype;
     // Don't put methods above this line !
 
-    Upgrader.prototype.loadObjects = function () {
-        this.controller = Game.getObjectById(this.memory.controller);
-        this.source = Game.getObjectById(this.memory.source);
-    };
-
     Upgrader.prototype.findController = function () {
-        this.controller = this.room.controller;
-        this.memory.controller = this.controller;
-        this.memory.controller = this.controller === null ? null : this.controller.id;
+        this.storeObject(UPGRADER_CONTROLLER, this.room.controller);
     };
 
     Upgrader.prototype.findSource = function () {
-        this.source = this.pos.findClosestByPath(FIND_MY_SPAWNS);
-        this.memory.source = this.source === null ? null : this.source.id;
+        this.storeObject(UPGRADER_SOURCE, this.pos.findClosestByPath(FIND_MY_SPAWNS));
     };
 
     Upgrader.prototype.isLoading = function () {
@@ -39,7 +36,7 @@ module.exports = function () {
     };
 
     Upgrader.prototype._load = function () {
-        if (this.source === null) {
+        if (!this.source) {
             this.findSource();
         }
         if (!this.withdrawing(this.source, RESOURCE_ENERGY)) {
@@ -48,7 +45,7 @@ module.exports = function () {
     };
 
     Upgrader.prototype._upgrade = function () {
-        if (this.controller === null) {
+        if (!this.controller) {
             this.findController();
         }
         if (!this.transferring(this.controller, RESOURCE_ENERGY)) {
