@@ -3,9 +3,10 @@ module.exports.loop = function () {
     let spawner = require('spawner');
     let taskRunner = require('taskrunner');
     let population = {
-        HARVESTER: {min: 12, parts: [MOVE, CARRY, WORK, WORK, WORK]},
+        HARVESTER: {min: 12, parts: [MOVE, MOVE, CARRY, WORK, WORK, WORK]},
         UPGRADER: {min: 5, parts: [WORK, WORK, MOVE, CARRY], memory: {state: 'LOADING'}},
         BUILDER: {min: 2, parts: [WORK, CARRY, MOVE, WORK], memory: {state: 'LOADING'}},
+        REPAIRER: {min: 2, parts: [CARRY, MOVE, WORK, WORK], memory: {state: 'LOADING'}},
     };
     spawner.init(Game.spawns.Spawn1);
     spawner.garbageCollection();

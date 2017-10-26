@@ -47,12 +47,15 @@ module.exports = function () {
     };
 
     Harvester.prototype._unload = function () {
+        // Targte full
         if (this.unload && this.unload.energyCapacity === this.unload.energy) {
             this.unload = null;
         }
+        // Find target
         if (!this.unload) {
             this.findUnload();
         }
+        // Transfer
         if (!this.transferring(this.unload, RESOURCE_ENERGY)) {
             this.moveTo(this.unload);
         }

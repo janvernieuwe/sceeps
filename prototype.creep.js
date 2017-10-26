@@ -55,4 +55,16 @@ module.exports = function () {
         delete this.memory[key];
         delete this[key];
     };
+
+    Creep.prototype.findSorted = function(find, filter, sort) {
+        let options = {};
+        if(filter) {
+            options.filter = filter;
+        }
+        let structures = this.room.find(find, options);
+        if(!structures.length) {
+            return [null];
+        }
+        return structures.sort((a, b) => a[sort] > b[sort] ? 1 : -1);
+    };
 };

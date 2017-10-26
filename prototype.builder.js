@@ -31,16 +31,12 @@ module.exports = function () {
         this.storeObject(BUILDER_CONSTRUCTION, this.findWeakestWall());
     };
 
-    Builder.prototype.findWeakestWall = function() {
-        let walls = this.room.find(
+    Builder.prototype.findWeakestWall = function () {
+        return this.findSorted(
             FIND_STRUCTURES,
-            {filter: (s) => s.structureType === STRUCTURE_WALL}
-        );
-        walls = walls.sort((a, b) => a.hits > b.hits ? 1 : -1);
-        if(!walls.length) {
-            return null;
-        }
-        return walls[0];
+            (s) => s.structureType === STRUCTURE_WALL && s.hits < s.hitsMax,
+            'hits'
+        )[0];
     };
 
     Builder.prototype.findSource = function () {

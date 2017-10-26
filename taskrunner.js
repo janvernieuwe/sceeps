@@ -13,6 +13,10 @@ module.exports = {
             builder: function (creep, halt) {
                 require('prototype.builder')();
                 (new Builder(creep, halt)).run();
+            },
+            repairer: function (creep, halt) {
+                require('prototype.repairer')();
+                (new Repairer(creep, halt)).run();
             }
         };
         for (let roleName in roles) {
